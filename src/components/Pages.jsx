@@ -4,7 +4,9 @@ import TableComponent from './TableComponent';
 function Pages() {
   const [data, setData] = useState([]);
   const [formValues, setFormValues] = useState({});
-  const [idCounter, setIdCounter] = useState(1); // Initialize an ID counter
+  const [idCounter, setIdCounter] = useState(1);
+  const [editingId, setEditingId] = useState(null);
+  const [animateCard, setAnimateCard] = useState(false); // New state to trigger animation
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,26 +19,45 @@ function Pages() {
   const handleSubmit = () => {
     if (formValues.subject && formValues.task) {
       const newTodo = {
-        id: idCounter, // Assign the current counter value as the ID
+        id: idCounter,
         ...formValues,
       };
 
-      setData((prevData) => [...prevData, newTodo]);
-      localStorage.setItem('value', JSON.stringify([...data, newTodo]));
-      console.log([...data, newTodo]);
+      if (editingId !== null) {
+        const updatedData = data.map((item) =>
+          item.id === editingId ? { ...item, ...formValues } : item
+        );
+        setData(updatedData);
+        localStorage.setItem('value', JSON.stringify(updatedData));
+        setEditingId(null);
+      } else {
+        setData((prevData) => [...prevData, newTodo]);
+        localStorage.setItem('value', JSON.stringify([...data, newTodo]));
+        setIdCounter((prevCounter) => prevCounter + 1);
+      }
 
       setFormValues({});
-      setIdCounter((prevCounter) => prevCounter + 1);
+      setAnimateCard(true); // Trigger animation
+
+      // Reset the animation state after it completes
+      setTimeout(() => {
+        setAnimateCard(false);
+      }, 500); // Duration of the animation
     } else {
       alert('Please fill out both fields.');
     }
   };
 
-  // Function to delete an item by ID
   const deleteItem = (id) => {
     const updatedData = data.filter((item) => item.id !== id);
     setData(updatedData);
     localStorage.setItem('value', JSON.stringify(updatedData));
+  };
+
+  const handleEdit = (id) => {
+    const itemToEdit = data.find((item) => item.id === id);
+    setFormValues(itemToEdit);
+    setEditingId(id);
   };
 
   return (
@@ -58,10 +79,14 @@ function Pages() {
           value={formValues.task || ''}
           onChange={handleChange}
         />
-        <button onClick={handleSubmit}>Submit</button>
+        <button onClick={handleSubmit}>
+          {editingId !== null ? 'Update' : 'Submit'}
+        </button>
       </div>
 
-      <TableComponent value={data} onDelete={deleteItem} />
+      <div className={`card-container ${animateCard ? 'animate' : ''}`}>
+        <TableComponent value={data} onDelete={deleteItem} onEdit={handleEdit} />
+      </div>
     </div>
   );
 }
