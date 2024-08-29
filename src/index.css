@@ -1,7 +1,7 @@
 /* General Styles for the Page */
 body {
   font-family: 'Arial', sans-serif;
-  background: linear-gradient(135deg, #9c1aff, #6e00ff);
+  background: linear-gradient(135deg, #a955e9, #8040d3);
   margin: 0;
   padding: 0;
   display: flex;
@@ -41,8 +41,8 @@ input[type='text'] {
 }
 
 input[type='text']:focus {
-  border-color: #6e00ff;
-  box-shadow: 0 0 8px rgba(110, 0, 255, 0.25);
+  border-color: #7309fd;
+  box-shadow: 0 0 8px rgba(115, 12, 250, 0.25);
 }
 
 /* Submit Button */
